@@ -1,5 +1,5 @@
 {
-  "name": "kif_parser",
+  "name": "@tsshogi/kanna",
   "version": "0.0.1",
   "description": "棋譜データをパースするライブラリです",
   "author": "tkgstrator",
@@ -9,6 +9,13 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": ["dist"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tsshogi/kanna.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "config": {
     "commitizen": {
       "path": "@commitlint/cz-commitlint"
