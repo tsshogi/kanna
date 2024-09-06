@@ -1,0 +1,17 @@
+services:
+  kif_parser:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUN_VERSION: 1.1.26
+    volumes:
+      - node_modules:/home/bun/app/node_modules
+      - ../:/home/bun/app:cached
+    ports:
+      - 8787:8787
+    tty: true
+    stdin_open: true
+
+volumes:
+  node_modules:

@@ -1,0 +1,16 @@
+[build]
+entry = "src/main.ts" # エントリーポイント
+
+[test]
+coverage = true # カバレッジを取得する
+
+[install]
+dev = true
+peer = true
+production = false
+auto = 'auto'
+frozenLockfile = true
+
+[run]
+shell = 'bun'
+bun = true
