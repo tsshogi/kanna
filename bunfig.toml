@@ -9,7 +9,7 @@ dev = true
 peer = true
 production = false
 auto = 'auto'
-frozenLockfile = true
+frozenLockfile = false
 
 [run]
 shell = 'bun'
