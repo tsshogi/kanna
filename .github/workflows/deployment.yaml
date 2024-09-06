@@ -29,6 +29,6 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: '@tsshogi'
       - name: Deploy
-        run: npm publish --access public
+        run: npm publish --access public --registry=https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
