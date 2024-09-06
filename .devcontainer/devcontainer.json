@@ -1,0 +1,83 @@
+{
+  "name": "KIF Parser",
+  "dockerComposeFile": ["docker-compose.yaml"],
+  "service": "kif_parser",
+  "workspaceFolder": "/home/bun/app",
+  "shutdownAction": "stopCompose",
+  "remoteUser": "bun",
+  "mounts": [
+    "source=${env:HOME}/home/bun/.ssh,target=/.ssh,type=bind,consistency=cached,readonly"
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "2.37.0"
+    },
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "configureZshAsDefaultShell": true
+    },
+    "ghcr.io/devcontainers/features/node:1.5.0": {
+      "version": "20.16.0"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "moby": false,
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/dhoeric/features/act:1": {}
+  },
+  "postAttachCommand": "/bin/sh .devcontainer/postAttachCommand.sh",
+  "postCreateCommand": "/bin/sh .devcontainer/postCreateCommand.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "EditorConfig.EditorConfig",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "PKief.material-icon-theme",
+        "antfu.file-nesting",
+        "bierner.markdown-mermaid",
+        "bierner.markdown-preview-github-styles",
+        "biomejs.biome",
+        "eamodio.gitlens",
+        "jebbs.markdown-extended",
+        "ms-vscode.vscode-typescript-next",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        "betterTypeScriptErrors.prettify": true,
+        "debug.internalConsoleOptions": "neverOpen",
+        "diffEditor.diffAlgorithm": "advanced",
+        "diffEditor.experimental.showMoves": true,
+        "diffEditor.renderSideBySide": false,
+        "editor.formatOnPaste": true,
+        "editor.guides.bracketPairs": "active",
+        "editor.codeActionsOnSave": {
+          "quickfix.biome": "explicit",
+          "source.organizeImports.biome": "explicit"
+        },
+        "editor.formatOnSave": true,
+        "files.watcherExclude": {
+          "**/node_modules/**": true
+        },
+        "scm.defaultViewMode": "tree",
+        "[javascript]": {
+          "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[javascriptreact]": {
+          "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[json]": {
+          "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[jsonc]": {
+          "editor.defaultFormatter": "biomejs.biome"
+        }
+      }
+    }
+  }
+}

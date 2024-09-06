@@ -1,0 +1,38 @@
+name: Release Validation
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+
+jobs:
+  validation:
+    name: Validation
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install
+        if: ${{ github.event.head.user.login == 'act' }}
+        run: |
+          apt-get update
+          apt-get install -y unzip zip jq curl
+      - name: Latest Release Version
+        id: latest_version
+        uses: fangqiuming/latest-release-version@v1.1.1
+      - name: Current Version
+        id: current_version
+        run: |
+          echo "version=v$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
+      - name: Compare Versions
+        id: comparison
+        uses: fabriziocacicia/semver-compare-action@v0.1.0
+        with:
+          first: ${{ steps.current_version.outputs.version }}
+          second: ${{ steps.latest_version.outputs.version }}
+      - name: Validate Version
+        run: |
+          if [ "${{ steps.comparison.outputs.result }}" == true ]; then
+            echo "Version is valid"
+          else
+            echo "Version is invalid"
+            exit 1
+          fi
