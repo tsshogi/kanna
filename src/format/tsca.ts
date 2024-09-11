@@ -1,3 +1,4 @@
+import { machine } from 'node:os'
 import { Color } from '@/enums/color'
 import { MetadataKey } from '@/enums/metadata'
 import { Board } from '@/models/board.dto'
@@ -79,19 +80,24 @@ export const TCSA = z.preprocess(
           )
         },
         get answer(): TCSV.Move[][] {
-          return chunk(
-            object.answercsv
-              .split('_')
-              .filter((value) => value.length > 0)
-              .map((value, index) => {
-                const [fromX, fromY, toX, toY, promote] = value.split('').map((value) => Number.parseInt(value))
-                return Move.parse({
-                  from: { x: fromX, y: fromY },
-                  to: { x: toX, y: toY },
-                  promote: promote === 1
-                })
-              }),
-            object.progresscnt
+          // 手順分岐は全てが同じ長さなら区切り文字がないが、異なる長さが含まれる場合は`_@`で区切られている
+          const moves_list: string[][] = (
+            object.answercsv.includes('@')
+              ? object.answercsv.split('_@')
+              : chunk(
+                  object.answercsv.split('_').filter((value) => value.length > 0),
+                  object.progresscnt
+                ).map((value) => value.join('_'))
+          ).map((value) => value.split('_').filter((value) => value.length > 0))
+          return moves_list.map((moves) =>
+            moves.map((move) => {
+              const [fromX, fromY, toX, toY, promote] = move.split('').map((value) => Number.parseInt(value))
+              return Move.parse({
+                from: { x: fromX, y: fromY },
+                to: { x: toX, y: toY },
+                promote: promote === 1
+              })
+            })
           )
         },
         get board(): TCSV.Board {
@@ -131,15 +137,17 @@ export const TCSA = z.preprocess(
             // 初期局面に戻す
             record.goto(0)
             for (const move of moves) {
-              const m: TSMove | null = record.position.createMove(
-                move.from.x === 0 ? Object.values(PieceType)[move.from.y - 1] : new TSSquare(move.from.x, move.from.y),
-                new TSSquare(move.to.x, move.to.y)
-              )
+              const m: TSMove | null = record.position.createMove(move.piece, new TSSquare(move.to.x, move.to.y))
               // 不正な指し手でなければ追加する
-              if (m !== null) {
-                m.promote = move.promote
-                record.append(m)
+              if (m === null) {
+                console.error('[盤面]:', object.csv)
+                console.error('[盤面]:', (this as TCSA).pieces)
+                console.error('[解答]:', object.answercsv)
+                console.error('[棋譜]:', exportKIF(record))
+                throw new Error(`Invalid move: ${move}`)
               }
+              m.promote = move.promote
+              record.append(m)
             }
             // 投了コマンドの追加
             record.append(SpecialMoveType.RESIGN)
