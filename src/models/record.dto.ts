@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Answer } from './answer.dto'
 import { Board } from './board.dto'
 import { Hand } from './hand.dto'
 import { Metadata } from './metadata.dto'

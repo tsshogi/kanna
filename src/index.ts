@@ -6,6 +6,7 @@ import { TCSA } from './format/tsca'
 import type { Board } from './models/board.dto'
 import type { Hand } from './models/hand.dto'
 import type { Metadata } from './models/metadata.dto'
+import type { Move } from './models/move.dto'
 import type { Record } from './models/record.dto'
 import type { Square } from './models/square.dto'
 
@@ -17,6 +18,7 @@ export namespace TCSV {
   export type Square = z.infer<typeof Square>
   export type Board = z.infer<typeof Board>
   export type Metadata = z.infer<typeof Metadata>
+  export type Move = z.infer<typeof Move>
 }
 
 declare module '@/models/square.dto' {
