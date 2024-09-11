@@ -128,12 +128,14 @@ export const TCSA = z.preprocess(
             return record
           }
           for (const moves of (this as TCSA).answer) {
+            // 初期局面に戻す
             record.goto(0)
             for (const move of moves) {
               const m: TSMove | null = record.position.createMove(
                 move.from.x === 0 ? Object.values(PieceType)[move.from.y - 1] : new TSSquare(move.from.x, move.from.y),
                 new TSSquare(move.to.x, move.to.y)
               )
+              // 不正な指し手でなければ追加する
               if (m !== null) {
                 m.promote = move.promote
                 record.append(m)
