@@ -8,8 +8,8 @@ services:
     volumes:
       - node_modules:/home/bun/app/node_modules
       - ../:/home/bun/app:cached
-    ports:
-      - 8787:8787
+    # ports:
+    #   - 8787:8787
     tty: true
     stdin_open: true
 
