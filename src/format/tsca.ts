@@ -1,14 +1,34 @@
+import { machine } from 'node:os'
 import { Color } from '@/enums/color'
 import { MetadataKey } from '@/enums/metadata'
 import { Board } from '@/models/board.dto'
 import { Hand } from '@/models/hand.dto'
 import { Metadata } from '@/models/metadata.dto'
+import { Move } from '@/models/move.dto'
 import { Record } from '@/models/record.dto'
 import { Square } from '@/models/square.dto'
 import dayjs from 'dayjs'
-import { type Record as TSRecord, importCSA } from 'tsshogi'
+import {
+  PieceType,
+  SpecialMoveType,
+  type Move as TSMove,
+  Node as TSNode,
+  type Record as TSRecord,
+  Square as TSSquare,
+  exportCSA,
+  exportKIF,
+  importCSA
+} from 'tsshogi'
 import { z } from 'zod'
 import type { TCSV } from '..'
+
+const chunk = <T>(arr: T[], size: number): T[][] => {
+  const results: T[][] = []
+  for (let i = 0; i < arr.length; i += size) {
+    results.push(arr.slice(i, i + size))
+  }
+  return results
+}
 
 /**
  * 詰将棋パラダイス用のフォーマット
@@ -59,6 +79,27 @@ export const TCSA = z.preprocess(
             })
           )
         },
+        get answer(): TCSV.Move[][] {
+          // 手順分岐は全てが同じ長さなら区切り文字がないが、異なる長さが含まれる場合は`_@`で区切られている
+          const moves_list: string[][] = (
+            object.answercsv.includes('@')
+              ? object.answercsv.split('_@')
+              : chunk(
+                  object.answercsv.split('_').filter((value) => value.length > 0),
+                  object.progresscnt
+                ).map((value) => value.join('_'))
+          ).map((value) => value.split('_').filter((value) => value.length > 0))
+          return moves_list.map((moves) =>
+            moves.map((move) => {
+              const [fromX, fromY, toX, toY, promote] = move.split('').map((value) => Number.parseInt(value))
+              return Move.parse({
+                from: { x: fromX, y: fromY },
+                to: { x: toX, y: toY },
+                promote: promote === 1
+              })
+            })
+          )
+        },
         get board(): TCSV.Board {
           return Board.parse({
             pieces: [1, 2, 3, 4, 5, 6, 7, 8, 9].map((y) =>
@@ -81,7 +122,7 @@ export const TCSA = z.preprocess(
           ].map((metadata) => Metadata.parse(metadata))
         },
         get record(): TSRecord | Error {
-          return importCSA(
+          const record: TSRecord | Error = importCSA(
             Record.parse({
               metadata: (this as TCSA).metadata,
               pieces: (this as TCSA).pieces,
@@ -89,6 +130,29 @@ export const TCSA = z.preprocess(
               board: (this as TCSA).board
             }).csa
           )
+          if (record instanceof Error) {
+            return record
+          }
+          for (const moves of (this as TCSA).answer) {
+            // 初期局面に戻す
+            record.goto(0)
+            for (const move of moves) {
+              const m: TSMove | null = record.position.createMove(move.piece, new TSSquare(move.to.x, move.to.y))
+              // 不正な指し手でなければ追加する
+              if (m === null) {
+                console.error('[盤面]:', object.csv)
+                console.error('[盤面]:', (this as TCSA).pieces)
+                console.error('[解答]:', object.answercsv)
+                console.error('[棋譜]:', exportKIF(record))
+                throw new Error(`Invalid move: ${move}`)
+              }
+              m.promote = move.promote
+              record.append(m)
+            }
+            // 投了コマンドの追加
+            record.append(SpecialMoveType.RESIGN)
+          }
+          return record
         }
       }
     })
