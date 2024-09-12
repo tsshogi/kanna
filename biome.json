@@ -19,7 +19,7 @@
     "indentStyle": "space",
     "indentWidth": 2,
     "lineEnding": "lf",
-    "lineWidth": 80
+    "lineWidth": 100
   },
   "javascript": {
     "formatter": {
@@ -39,6 +39,7 @@
   },
   "json": {
     "formatter": {
+      "enabled": true,
       "trailingCommas": "none"
     }
   }

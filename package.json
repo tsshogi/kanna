@@ -1,6 +1,6 @@
 {
   "name": "@tsshogi/kanna",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "棋譜データをパースするライブラリです",
   "author": "tkgstrator",
   "license": "MIT",

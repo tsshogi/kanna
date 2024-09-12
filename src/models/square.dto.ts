@@ -24,8 +24,9 @@ export const Square = z.preprocess(
         return Piece.OU
       })(),
       color: color === 0 ? Color.BLACK : Color.WHITE,
-      x: x,
-      y: y,
+      // x === 0 || y === 0 のときに強制的に持ち駒に変換する
+      x: y === 0 ? 0 : x,
+      y: x === 0 ? 0 : y,
       is_promoted: is_promoted === 2
     }
   },
